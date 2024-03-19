@@ -5,6 +5,7 @@ import org.shiv.digitallibrary.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,51 +16,46 @@ public class StudentController {
     StudentService studentService;
 
     @PostMapping(path = "/addStudent")
-    public <S extends Student> S save(@RequestBody S entity) {
-        return studentService.save(entity);
+    public void addStudent(@RequestBody Student student)
+    {
+        studentService.save(student);
     }
-    @PostMapping(path = "/addAllStudent")
-    public <S extends Student> Iterable<S> saveAll(Iterable<S> entities) {
-        return studentService.saveAll(entities);
-    }
-    @GetMapping(path = "/getStudent")
-    public Optional<Student> findById(Integer integer) {
-        return studentService.findById(integer);
-    }
-    @GetMapping(path = "/studentExist/{student_id}")
-    public boolean existsById(@PathVariable("student_id") Integer integer) {
-        return studentService.existsById(integer);
+    @PostMapping(path = "/addStudents")
+    public void addStudents(@RequestBody List<Student> studentList)
+    {
+        studentService.saveAll(studentList);
     }
     @GetMapping(path = "/getStudents")
-    public Iterable<Student> findAll() {
-        return studentService.findAll();
+    public List<Student> getStudents()
+    {
+        List<Student> studentList =new ArrayList<>();
+        studentService
+                .findAll()
+                .iterator()
+                .forEachRemaining(studentList::add);
+        return studentList;
+    }
+    @GetMapping(path = "/getStudent/{student_id}")
+    public Optional<Student> getStudent(@PathVariable("student_id") Integer id)
+    {
+        return studentService.findById(id);
+    }
+    @PutMapping(path = "/updateStudent")
+    public void updateStudent(@RequestBody Student student)
+    {
+        if(studentService.existsById(student.getId()))
+            studentService.save(student);
+    }
+    @DeleteMapping(path = "/deleteStudent")
+    public void deleteStudent(@RequestBody Student student)
+    {
+        studentService.delete(student);
+    }
+    @DeleteMapping(path = "/deleteStudentById/{student_id}")
+    public void deleteStudentById(@PathVariable("student_id") Integer id)
+    {
+        studentService.deleteById(id);
     }
 
-    public Iterable<Student> findAllById(Iterable<Integer> integers) {
-        return studentService.findAllById(integers);
-    }
 
-    public long count() {
-        return studentService.count();
-    }
-
-    public void deleteById(Integer integer) {
-        studentService.deleteById(integer);
-    }
-
-    public void delete(Student entity) {
-        studentService.delete(entity);
-    }
-
-    public void deleteAllById(Iterable<? extends Integer> integers) {
-        studentService.deleteAllById(integers);
-    }
-
-    public void deleteAll(Iterable<? extends Student> entities) {
-        studentService.deleteAll(entities);
-    }
-
-    public void deleteAll() {
-        studentService.deleteAll();
-    }
 }
